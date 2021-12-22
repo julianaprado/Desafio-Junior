@@ -76,8 +76,9 @@ private func getCharacters(completion: @escaping (Result<[CharactersData]?, e>) 
 
 recebe uma complection, com @escaping para permitir que o bloco de código continue mesmo depois que a chamada à função acabe.
 
-#### Com a chamada a API feita, passei a planejar o wireframe do aplicativo:
+#### Front-End
 
+Com a chamada a API feita, passei a planejar o wireframe do aplicativo:
 ![Wireframe](https://github.com/julianaprado/Desafio-Junior/blob/dc20398f1188900e2826646fc1042ffddee7f36f/Imagens/Wireframe.png)
 
 
