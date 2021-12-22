@@ -44,8 +44,41 @@ Criei o struct (permitindo cópia) com os dados que serão recebidos pela API.
 
 #### [Character Manager](https://github.com/julianaprado/Desafio-Junior/blob/3e8676e4082c8c7d3eb2fd5cda20a4d2b774c384/DesafioJunior/Model/CharactersManager.swift):
 
-O Character Manager é uma classe (objeto) que lida com os serviços da API e grava em sua instância, o Array contendo os personagens.
+O Character Manager é uma classe (objeto) que lida com os serviços da API e grava em sua instância, o Array contendo os personagens. A função getCharacter:
 
+```
+/// Function parse JSON data
+/// - Parameter completion: Completion that returns a charactersData Array if success, or Error enum if failure
+private func getCharacters(completion: @escaping (Result<[CharactersData]?, e>) -> Void) {
+        
+        // 1.Create a URL
+        guard let url = URL(string: self.requestURL) else {
+            completion(.failure(e.urlError))
+            return
+        }
+        // 2. Create a URLSession
+        let dataTask = URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let charactersData = data else{
+                completion(.failure(e.noData))
+                return
+        }
+            //3. Parse Data
+            do {
+                let decoder = JSONDecoder()
+                let charactersResponse = try! decoder.decode(CharactersData.self, from: charactersData)
+                completion(.success([charactersResponse]))
+            }
+        }
+            // 4. Start the task
+         dataTask.resume()
+}
+```
+
+recebe uma complection, com @escaping para permitir que o bloco de código continue mesmo depois que a chamada à função acabe.
+
+#### Com a chamada a API feita, passei a planejar o wireframe do aplicativo:
+
+(Wireframe)[]
 
 
 
