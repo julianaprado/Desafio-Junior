@@ -12,17 +12,20 @@ class ViewController: UIViewController {
     //MARK: - Injected Properties
     typealias Factory = SelectedCharactersSceneFactory & FilterSceneFactory
     let factory: Factory
-    lazy var listOfCharacters = [CharactersData]()
+    var characterManager: CharactersManager
     
     //MARK: - Properties
     private var mainView = MainView()
-   
+    var currentPage = 1
+    var isLoadingData = false
+    var characterData = [CharacterData]()
+    let refreshControl = UIRefreshControl()
+    
     //MARK: - Initializers
-    init(factory: Factory, characters: [CharactersData]){
+    init(factory: Factory, characterManager: CharactersManager){
         self.factory = factory
+        self.characterManager = characterManager
         super.init(nibName: nil, bundle: nil)
-        self.listOfCharacters = characters
-
     }
 
     required init?(coder: NSCoder) {
@@ -36,6 +39,9 @@ class ViewController: UIViewController {
         mainView.delegate = self
         mainView.tableView.delegate = self
         mainView.tableView.dataSource = self
+        refreshControl.attributedTitle = NSAttributedString(string: "Fetch Previous")
+           refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
+        self.mainView.tableView.addSubview(refreshControl)
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
@@ -44,10 +50,68 @@ class ViewController: UIViewController {
         dismiss(animated: false, completion: nil)
     }
     
+    //MARK: - Functionality
+    func loadNextPage(){
+        if self.characterManager.listOfCharacters[0].info.next != nil{
+            self.currentPage += 1
+            loadListOfCharacters()
+        } else {
+            loadListOfCharacters()
+        }
+    }
+    
+    func loadPreviousPage(){
+        if self.characterManager.listOfCharacters[0].info.prev != nil{
+            self.currentPage -= 1
+            loadListOfCharacters()
+        } else {
+            loadListOfCharacters()
+            refreshControl.endRefreshing()
+        }
+    }
+    
+    @objc func refresh(_ sender: AnyObject) {
+        loadPreviousPage()
+        if self.characterManager.loadedData {
+            refreshControl.endRefreshing()
+        }
+    }
+    
+    func loadListOfCharacters(){
+        self.characterData = self.characterManager.characters
+        
+        let group = DispatchGroup()
+        group.enter()
+        DispatchQueue.global(qos: .default).async{
+            self.characterManager.getNextPage(page: self.currentPage)
+            self.characterManager.fetchApi()
+            group.leave()
+        }
+        group.wait()
+        
+        DispatchQueue.main.async{
+            self.mainView.tableView.reloadData()
+            let indexPath = IndexPath(row: 0, section: 0)
+            self.mainView.tableView.scrollToRow(at: indexPath, at: .top, animated: false)
+            self.mainView.tableView.reloadData()
+        }
+        self.isLoadingData = false
+    }
+    
 }
 
 //MARK: - UITableViewDelegate
 extension ViewController: UITableViewDelegate{
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        let pos = scrollView.contentSize.height
+        if (pos < scrollView.contentOffset.y + scrollView.frame.size.height){
+            if !isLoadingData {
+                self.isLoadingData = true
+                loadNextPage()
+            }
+        }
+    }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         
@@ -73,7 +137,7 @@ extension ViewController: UITableViewDelegate{
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-            return listOfCharacters[0].results.count
+        return self.characterManager.characters.count
     }
     
 }
@@ -105,7 +169,7 @@ extension ViewController: UITableViewDataSource{
                 return UITableViewCell()
             }
             cell.delegate = self
-        cell.configureCell(character: listOfCharacters[0].results[indexPath.section], id: indexPath.section)
+        cell.configureCell(character: self.characterManager.characters[indexPath.section], id: indexPath.section)
             return cell
     }
     
@@ -116,7 +180,7 @@ extension ViewController: CharacterTableViewCellDelegate{
     /// toggleButton
     /// - Parameter cellId: cell Id is the row id of the clicked character
     func toggleButton(cellId: Int) {
-        navigationController?.present(factory.createSelectedCharactersScene(character: listOfCharacters[0].results[cellId]), animated: true, completion: nil)
+        navigationController?.present(factory.createSelectedCharactersScene(character: self.characterManager.characters[cellId]), animated: true, completion: nil)
     }
 }
 
@@ -124,7 +188,7 @@ extension ViewController: MainViewDelegate{
     /// Presents the Filter View Controller modally
     func filterTapped() {
         guard let navController = self.navigationController else {return}
-        let viewController = factory.createFilterScene()
+        let viewController = factory.createFilterScene(characterManager: self.characterManager)
         viewController.modalPresentationStyle = .overCurrentContext
         viewController.modalTransitionStyle = .crossDissolve
         viewController.delegate = self
@@ -138,8 +202,8 @@ extension ViewController: FilterViewControllerDelegate {
     /// Recieves the new list of characters with the filters applied
     /// - Parameter characters:
     /// a list of Character Data containing the characters that match the chosen filters
-    func applyFilters(characters: [CharactersData]) {
-        self.listOfCharacters = characters
+    func applyFilters(characters: CharactersManager) {
+        self.characterManager = characters
         self.mainView.tableView.reloadData()
     }
     

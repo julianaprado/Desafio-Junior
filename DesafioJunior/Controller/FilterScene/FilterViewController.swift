@@ -12,19 +12,18 @@ class FilterViewController: UIViewController{
     //MARK: - Injected Properties
     typealias Factory = MainViewSceneFactory
     let factory: Factory
+    var characterManager: CharactersManager
     
     //MARK: - Properties
     private var mainView = FilterVIew()
     var delegate: FilterViewControllerDelegate?
     var filterString = ""
-    
-    var loadedData = false
-    lazy var listOfCharacters = [CharactersData]()
 
     
     //MARK: - Initializers
-    init(factory: Factory){
+    init(factory: Factory, characterManager: CharactersManager){
         self.factory = factory
+        self.characterManager = characterManager
         super.init(nibName: nil, bundle: nil)
         self.view = mainView
         self.mainView.delegate = self
@@ -46,34 +45,11 @@ class FilterViewController: UIViewController{
     }
     
     //MARK: - Functionality
-    
-    /// Setup Characters
-    /// - Parameter characterManager:
-    ///  Allows for the character manager to get the list of characters from the api
-    ///  if an error occurs, an alert is issued to the user.
-    func setupCharacters(characterManager: CharactersManager){
-        characterManager.getCharacters{ [ weak self ] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .failure(let error):
-                    let alert = UIAlertController(title: "Ocorreu um erro.", message: error.localizedDescription, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                    self?.present(alert, animated: true)
-                    break
-                case .success(let characters):
-                    self?.listOfCharacters = characters!
-                    self?.loadedData = true
-                }
-            }
-        }
-    }
-    
-    
     /// Authorizes Segue if the api is loaded properly
     @objc private func authorizeSegue() {
-        if loadedData {
+        if self.characterManager.loadedData {
             ///passes the character list to the ViewController
-            delegate?.applyFilters(characters: listOfCharacters)
+            delegate?.applyFilters(characters: self.characterManager)
             
             ///since this view was presented modally, it has to be dismissed
             self.dismiss(animated: false, completion: nil)
@@ -108,8 +84,8 @@ extension FilterViewController: FilterViewDelegate {
             filterString.removeLast(1)
             print(filterString)
             
-            let characterManager = CharactersManager(searchFor: filterString)
-            setupCharacters(characterManager: characterManager)
+            self.characterManager.searchFor(filters: filterString)
+            self.characterManager.fetchApi()
             
             Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(authorizeSegue), userInfo: nil, repeats: false)
         }

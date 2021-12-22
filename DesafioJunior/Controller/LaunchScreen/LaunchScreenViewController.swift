@@ -16,13 +16,6 @@ class LaunchScreenViewController: UIViewController {
     //MARK: - Properties
     private var mainView = LaunchScreenView()
     var loadedData = false
-    lazy var listOfCharacters = [CharactersData](){
-        didSet {
-            DispatchQueue.main.async {
-                self.loadedData = true
-            }
-        }
-    }
     var characterManager: CharactersManager
     
     //MARK: - Initializers
@@ -31,8 +24,7 @@ class LaunchScreenViewController: UIViewController {
         self.characterManager = CharactersManager(searchFor: "character/")
         super.init(nibName: nil, bundle: nil)
         self.view = mainView
-        setupCharacters()
-        
+        self.characterManager.fetchApi()
     }
 
     required init?(coder: NSCoder) {
@@ -51,13 +43,12 @@ class LaunchScreenViewController: UIViewController {
     
     //MARK: - Functionality
     @objc private func authorizeSegue() {
-        if loadedData {
-            
+        if self.characterManager.loadedData {
             /// guard the navigation controller
             guard let navController = self.navigationController else {return}
             
             ///creates the fade out transition animation
-            let viewController = factory.createMainViewScene(characters: self.listOfCharacters)
+            let viewController = factory.createMainViewScene(characterManager: self.characterManager)
             let transition = CATransition()
             transition.duration = 0.5
             transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
@@ -71,24 +62,4 @@ class LaunchScreenViewController: UIViewController {
             }
         }
     }
-    
-    //MARK: - Configuration
-    /// In case of success, fills the array with the characters
-    func setupCharacters(){
-        self.characterManager.getCharacters{ [ weak self ] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .failure(let error):
-                    let alert = UIAlertController(title: "Ocorreu um erro", message: error.localizedDescription, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                    self?.present(alert, animated: true)
-                    break
-                case .success(let characters):
-                    self?.listOfCharacters = characters!
-                    self?.loadedData = true
-                }
-            }
-        }
-    }
-    
 }

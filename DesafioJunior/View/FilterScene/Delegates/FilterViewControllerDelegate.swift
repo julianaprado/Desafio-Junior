@@ -8,5 +8,5 @@
 import Foundation
 
 protocol FilterViewControllerDelegate{
-    func applyFilters(characters: [CharactersData])
+    func applyFilters(characters: CharactersManager)
 }

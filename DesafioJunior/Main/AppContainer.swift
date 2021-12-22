@@ -47,12 +47,12 @@ extension AppContainer: LaunchScreenViewSceneFactory {
 protocol MainViewSceneFactory {
     /// Creates an instance of the ViewController to be used
     /// - Returns: ViewController
-    func createMainViewScene(characters: [CharactersData]) -> ViewController
+    func createMainViewScene(characterManager: CharactersManager) -> ViewController
 }
 
 extension AppContainer: MainViewSceneFactory {
-    func createMainViewScene(characters: [CharactersData]) -> ViewController {
-        return ViewController(factory: self, characters: characters)
+    func createMainViewScene(characterManager: CharactersManager) -> ViewController {
+        return ViewController(factory: self, characterManager: characterManager)
     }
 }
 
@@ -75,13 +75,13 @@ extension AppContainer: SelectedCharactersSceneFactory {
 protocol FilterSceneFactory {
     /// Creates an instance of the FilterViewController to be used
     /// - Returns: FilterViewController
-    func createFilterScene() -> FilterViewController
+    func createFilterScene(characterManager: CharactersManager) -> FilterViewController
 }
 
 extension AppContainer: FilterSceneFactory {
     
-    func createFilterScene() -> FilterViewController {
-        return FilterViewController(factory: self)
+    func createFilterScene(characterManager: CharactersManager) -> FilterViewController {
+        return FilterViewController(factory: self, characterManager: characterManager)
     }
     
 }
