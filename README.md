@@ -38,11 +38,11 @@ E deletar o arquivo main.storyboard, e o app estava abrindo para a Loading Scree
 
 ###Criando o Character Data e o Character Manager
 
-(Charcater Data)[https://github.com/julianaprado/Desafio-Junior/blob/3e8676e4082c8c7d3eb2fd5cda20a4d2b774c384/DesafioJunior/Model/CharactersData.swift]:
+[Charcater Data](https://github.com/julianaprado/Desafio-Junior/blob/3e8676e4082c8c7d3eb2fd5cda20a4d2b774c384/DesafioJunior/Model/CharactersData.swift):
 
 Criei o struct (permitindo cópia) com os dados que serão recebidos pela API.
 
-(Character Manager)[https://github.com/julianaprado/Desafio-Junior/blob/3e8676e4082c8c7d3eb2fd5cda20a4d2b774c384/DesafioJunior/Model/CharactersManager.swift]:
+[Character Manager](https://github.com/julianaprado/Desafio-Junior/blob/3e8676e4082c8c7d3eb2fd5cda20a4d2b774c384/DesafioJunior/Model/CharactersManager.swift):
 
 O Character Manager é uma classe (objeto) que lida com os serviços da API e grava em sua instância, o Array contendo os personagens.
 
