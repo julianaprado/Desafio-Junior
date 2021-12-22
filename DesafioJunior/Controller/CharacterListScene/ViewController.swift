@@ -16,9 +16,10 @@ class ViewController: UIViewController {
     
     //MARK: - Properties
     private var mainView = MainView()
+    
+    //Properties for pagination
     var currentPage = 1
     var isLoadingData = false
-    var characterData = [CharacterData]()
     let refreshControl = UIRefreshControl()
     
     //MARK: - Initializers
@@ -39,9 +40,11 @@ class ViewController: UIViewController {
         mainView.delegate = self
         mainView.tableView.delegate = self
         mainView.tableView.dataSource = self
+        
         refreshControl.attributedTitle = NSAttributedString(string: "Fetch Previous")
            refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
         self.mainView.tableView.addSubview(refreshControl)
+        
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
@@ -51,6 +54,8 @@ class ViewController: UIViewController {
     }
     
     //MARK: - Functionality
+    
+    /// Load next page
     func loadNextPage(){
         if self.characterManager.listOfCharacters[0].info.next != nil{
             self.currentPage += 1
@@ -60,6 +65,7 @@ class ViewController: UIViewController {
         }
     }
     
+    /// Loads previous page
     func loadPreviousPage(){
         if self.characterManager.listOfCharacters[0].info.prev != nil{
             self.currentPage -= 1
@@ -70,6 +76,8 @@ class ViewController: UIViewController {
         }
     }
     
+    /// Function called on refreshControl
+    /// - Parameter sender: AnyObject for Object-C recognition
     @objc func refresh(_ sender: AnyObject) {
         loadPreviousPage()
         if self.characterManager.loadedData {
@@ -77,9 +85,8 @@ class ViewController: UIViewController {
         }
     }
     
-    func loadListOfCharacters(){
-        self.characterData = self.characterManager.characters
-        
+    /// Load next page of characters
+    func loadListOfCharacters() {
         let group = DispatchGroup()
         group.enter()
         DispatchQueue.global(qos: .default).async{
@@ -91,10 +98,11 @@ class ViewController: UIViewController {
         
         DispatchQueue.main.async{
             self.mainView.tableView.reloadData()
+            self.mainView.tableView.reloadInputViews()
             let indexPath = IndexPath(row: 0, section: 0)
             self.mainView.tableView.scrollToRow(at: indexPath, at: .top, animated: false)
-            self.mainView.tableView.reloadData()
         }
+        self.mainView.tableView.reloadSections([0,1], with: .automatic)
         self.isLoadingData = false
     }
     
@@ -192,6 +200,9 @@ extension ViewController: MainViewDelegate{
         viewController.modalPresentationStyle = .overCurrentContext
         viewController.modalTransitionStyle = .crossDissolve
         viewController.delegate = self
+        DispatchQueue.main.async {
+            navController.popToViewController(ofClass: FilterViewController.self, animated: false)
+        }
         navController.present(viewController, animated: false)
     }
 

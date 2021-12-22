@@ -33,7 +33,7 @@ class FilterViewController: UIViewController{
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: - Life Cylcle
+    //MARK: - View Lifecycle
     override func viewDidLoad() {
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
@@ -71,6 +71,9 @@ extension FilterViewController: FilterViewDelegate {
     /// filter type: type of filter to apply
     func applyFilters(filters: [[String]]) {
         if filters == [] {
+            DispatchQueue.main.async {
+                self.navigationController?.popToViewController(ofClass: ViewController.self, animated: false)
+            }
             self.dismiss(animated: false, completion: nil)
         } else {
             for filter in filters{
@@ -93,6 +96,9 @@ extension FilterViewController: FilterViewDelegate {
 
     /// Dismisses the Filter view
     func dismissFilterView() {
+        DispatchQueue.main.async {
+            self.navigationController?.popToViewController(ofClass: ViewController.self, animated: false)
+        }
         self.dismiss(animated: false, completion: nil)
     }
 }

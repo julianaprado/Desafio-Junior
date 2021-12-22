@@ -16,6 +16,7 @@ class FilterButton: UIView {
     
     //MARK: - Injected Properties
     var type = ""
+    var label: String?
     
     //MARK: - Components
     lazy var button: UIButton = {
@@ -29,8 +30,6 @@ class FilterButton: UIView {
         but.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return but
     }()
-    
-    var label: String?
     
     //MARK: - Initializers
     init(filterLabel: String, filterType: String){
