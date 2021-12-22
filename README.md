@@ -78,7 +78,7 @@ recebe uma complection, com @escaping para permitir que o bloco de código conti
 
 #### Com a chamada a API feita, passei a planejar o wireframe do aplicativo:
 
-[Wireframe](https://github.com/julianaprado/Desafio-Junior/blob/dc20398f1188900e2826646fc1042ffddee7f36f/Imagens/Wireframe.png)
+![Wireframe](https://github.com/julianaprado/Desafio-Junior/blob/dc20398f1188900e2826646fc1042ffddee7f36f/Imagens/Wireframe.png)
 
 
 
