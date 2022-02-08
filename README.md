@@ -2,7 +2,7 @@
 
 Este projeto consome a REST api do Rick and Morty, e exibe uma lista com os personagens. 
 
-## Requisitos Obrigatórios Concluídos:
+## Requisitos Concluídos:
 - Listagem de personagens (Com Paginação)
 - Tela de detalhes do personagem
 
