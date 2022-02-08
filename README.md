@@ -1,4 +1,4 @@
-# Desafio Junior Stone
+# Desafio
 
 Este projeto consome a REST api do Rick and Morty, e exibe uma lista com os personagens. 
 
